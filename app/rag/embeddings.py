@@ -18,7 +18,14 @@ class EmbeddingService:
 
     def _embed_with_sentence_transformers(self, text: str) -> list[float]:
         if self._model is None:
-            from sentence_transformers import SentenceTransformer
+            try:
+                from sentence_transformers import SentenceTransformer
+            except ImportError as error:
+                raise RuntimeError(
+                    "EMBEDDING_BACKEND=sentence-transformers requires the ML dependencies. "
+                    "Build the default semantic image, or use the lightweight compose override "
+                    "with EMBEDDING_BACKEND=deterministic and RETRIEVAL_DEFAULT_MODE=keyword."
+                ) from error
 
             self._model = SentenceTransformer(self.model_name)
         vector = self._model.encode([text], normalize_embeddings=True)[0]

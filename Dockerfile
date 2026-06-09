@@ -9,10 +9,12 @@ WORKDIR /app
 
 COPY pyproject.toml ./
 
+ARG PYTHON_EXTRAS=ml
+
 RUN --mount=type=cache,target=/root/.cache/pip \
     printf '# ReviewRAG\n' > README.md \
     && pip install --upgrade pip \
-    && pip install ".[ml]"
+    && if [ -n "$PYTHON_EXTRAS" ]; then pip install ".[$PYTHON_EXTRAS]"; else pip install "."; fi
 
 COPY README.md ./
 COPY app ./app

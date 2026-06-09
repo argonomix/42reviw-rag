@@ -1,0 +1,9 @@
+services:
+  api:
+    build:
+      context: .
+      args:
+        PYTHON_EXTRAS: ""
+    environment:
+      EMBEDDING_BACKEND: deterministic
+      RETRIEVAL_DEFAULT_MODE: keyword

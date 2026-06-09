@@ -9,24 +9,32 @@ Japanese-first RAG MVP for turning anonymized 42 Tokyo peer review feedback into
 - Ollama local generation, default model `qwen2.5:7b-instruct`
 - Semantic embeddings with `sentence-transformers` and `intfloat/multilingual-e5-small`
 - Hybrid retrieval with BM25-style keyword search + vector search
-- Deterministic embedding fallback for local smoke tests
+- Deterministic embedding backend for local smoke tests
 
 ## Quick Start
 
 ```bash
 cp .env.example .env
-docker compose up --build
+make ingest
 ```
 
-Open `http://localhost:8000`, click `Seed ingest`, then ask a Japanese review question.
+Open `http://localhost:8000`, then ask a Japanese review question.
 
-The plain Compose command is the distribution-friendly default. For local development with a persistent Hugging Face model cache, use:
+`make ingest` is the first-time setup path: it builds the app image, starts the
+services, and ingests the seed data with fresh embeddings. Later, use:
 
 ```bash
-make dev
+make run
 ```
 
-This keeps downloaded `sentence-transformers` models in the `reviewrag_huggingface_cache` Docker volume across rebuilds. `HF_TOKEN` in `.env` is optional; set it only if you want higher Hugging Face Hub rate limits and faster first-time downloads.
+`make run` starts the existing containers/images without `--build`, so it does
+not reinstall Python dependencies on every startup. Use `make rebuild` only
+after dependency or image changes.
+
+The Makefile uses the development Compose override by default so downloaded
+`sentence-transformers` models stay in the `reviewrag_huggingface_cache` Docker
+volume across rebuilds. `HF_TOKEN` in `.env` is optional; set it only if you want
+higher Hugging Face Hub rate limits and faster first-time downloads.
 
 For better generation quality, pull the Ollama model once:
 
@@ -45,13 +53,13 @@ For NVIDIA GPU inference, install the NVIDIA Container Toolkit on the host, then
 the GPU Compose override:
 
 ```bash
-make gpu
+make run-gpu
 ```
 
 For the development workflow with both the Hugging Face cache and Ollama GPU access:
 
 ```bash
-make dev-gpu
+make rebuild-gpu
 ```
 
 Check that Ollama can see the GPU with:
@@ -105,14 +113,22 @@ pytest
 Docker workflow:
 
 ```bash
-make up        # normal docker compose up --build
-make dev       # compose with persistent Hugging Face cache
+make ingest    # build/start services and ingest seed data with reset
+make run       # start services without forcing a rebuild
+make rebuild   # rebuild the semantic image and start services
+make light     # build/run the base-only smoke-test image
 make clean     # remove only the opt-in Hugging Face cache volume
 make clean-all # remove Compose volumes, including Postgres, Ollama, and the HF cache
 ```
 
 The default embedding backend is `sentence-transformers`, using `intfloat/multilingual-e5-small`.
+Semantic `vector` and `hybrid` retrieval still embed each user query at request
+time, so the normal runtime image installs the ML dependencies with `.[ml]`.
 After changing embedding backends or models, re-ingest data with `{"reset": true}` or click `Seed ingest` so stored vectors match the active model.
 After applying retrieval schema migrations, re-ingest data the same way so stored keyword term frequencies are populated.
 
-Use `EMBEDDING_BACKEND=deterministic` only for lightweight local smoke tests that do not require semantic retrieval quality.
+Use `make light` only for lightweight local smoke tests. It builds the base app
+dependencies without `sentence-transformers` and sets
+`EMBEDDING_BACKEND=deterministic` plus `RETRIEVAL_DEFAULT_MODE=keyword`.
+Do not use lightweight mode for semantic retrieval quality, and do not point
+stored semantic vectors at a deterministic query embedding backend.
