@@ -29,6 +29,7 @@ services:
       DATABASE_URL: postgresql+psycopg://reviewrag:reviewrag@postgres:5432/reviewrag
       OLLAMA_BASE_URL: http://ollama:11434
       OLLAMA_MODEL: qwen2.5:7b-instruct
+      OLLAMA_REQUEST_TIMEOUT_SECONDS: ${OLLAMA_REQUEST_TIMEOUT_SECONDS:-180}
       EMBEDDING_BACKEND: sentence-transformers
       SEED_DATA_PATH: data/seed/reviews.json
       EVAL_DATA_PATH: data/eval/questions.json

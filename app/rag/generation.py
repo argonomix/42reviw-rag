@@ -57,7 +57,8 @@ async def generate_answer(query: str, chunks: list[RetrievedChunk]) -> tuple[str
 {evidence}
 """
     try:
-        async with httpx.AsyncClient(timeout=20) as client:
+        timeout = httpx.Timeout(settings.ollama_request_timeout_seconds, connect=10.0)
+        async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.post(
                 f"{settings.ollama_base_url}/api/generate",
                 json={

@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://reviewrag:reviewrag@localhost:5432/reviewrag"
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "qwen2.5:7b-instruct"
+    ollama_request_timeout_seconds: float = 180.0
     embedding_backend: str = "sentence-transformers"
     embedding_model_name: str = "intfloat/multilingual-e5-small"
     embedding_dimension: int = 384
@@ -20,6 +21,7 @@ class Settings(BaseSettings):
     eval_data_path: str = "data/eval/questions.json"
     default_campus: str = "42tokyo"
     default_language: str = "ja"
+    hf_token: str | None = None
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

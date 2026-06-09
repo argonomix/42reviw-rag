@@ -34,6 +34,32 @@ For better generation quality, pull the Ollama model once:
 docker compose exec ollama ollama pull qwen2.5:7b-instruct
 ```
 
+Ollama generation requests default to a 180 second timeout. Override it in `.env` if
+your local model needs longer:
+
+```bash
+OLLAMA_REQUEST_TIMEOUT_SECONDS=300
+```
+
+For NVIDIA GPU inference, install the NVIDIA Container Toolkit on the host, then run
+the GPU Compose override:
+
+```bash
+make gpu
+```
+
+For the development workflow with both the Hugging Face cache and Ollama GPU access:
+
+```bash
+make dev-gpu
+```
+
+Check that Ollama can see the GPU with:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.gpu.yml exec ollama nvidia-smi
+```
+
 ## API
 
 ```bash
