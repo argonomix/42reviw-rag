@@ -1,0 +1,12 @@
+services:
+  api:
+    environment:
+      HF_HOME: /cache/huggingface
+      SENTENCE_TRANSFORMERS_HOME: /cache/huggingface/sentence-transformers
+      HF_TOKEN: ${HF_TOKEN:-}
+    volumes:
+      - huggingface_cache:/cache/huggingface
+
+volumes:
+  huggingface_cache:
+    name: reviewrag_huggingface_cache

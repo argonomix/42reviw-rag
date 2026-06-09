@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -5,11 +7,14 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-COPY pyproject.toml README.md ./
+COPY pyproject.toml ./
 
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir ".[ml]"
+RUN --mount=type=cache,target=/root/.cache/pip \
+    printf '# ReviewRAG\n' > README.md \
+    && pip install --upgrade pip \
+    && pip install ".[ml]"
 
+COPY README.md ./
 COPY app ./app
 COPY data ./data
 COPY alembic.ini ./

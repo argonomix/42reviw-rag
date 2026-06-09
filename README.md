@@ -20,6 +20,14 @@ docker compose up --build
 
 Open `http://localhost:8000`, click `Seed ingest`, then ask a Japanese review question.
 
+The plain Compose command is the distribution-friendly default. For local development with a persistent Hugging Face model cache, use:
+
+```bash
+make dev
+```
+
+This keeps downloaded `sentence-transformers` models in the `reviewrag_huggingface_cache` Docker volume across rebuilds. `HF_TOKEN` in `.env` is optional; set it only if you want higher Hugging Face Hub rate limits and faster first-time downloads.
+
 For better generation quality, pull the Ollama model once:
 
 ```bash
@@ -66,6 +74,15 @@ Unknown raw 42 API fields are preserved in `source_payload`.
 ```bash
 python -m pip install -e ".[dev]"
 pytest
+```
+
+Docker workflow:
+
+```bash
+make up        # normal docker compose up --build
+make dev       # compose with persistent Hugging Face cache
+make clean     # remove only the opt-in Hugging Face cache volume
+make clean-all # remove Compose volumes, including Postgres, Ollama, and the HF cache
 ```
 
 The default embedding backend is `sentence-transformers`, using `intfloat/multilingual-e5-small`.
