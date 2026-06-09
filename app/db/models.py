@@ -53,11 +53,27 @@ class ReviewChunk(Base):
     evaluation_axis: Mapped[str | None] = mapped_column(String(80), nullable=True)
     language: Mapped[str] = mapped_column(String(12), index=True, default="ja")
     token_count: Mapped[int] = mapped_column(Integer, default=0)
+    search_token_count: Mapped[int] = mapped_column(Integer, default=0)
 
     review: Mapped[Review] = relationship(back_populates="chunks")
     embedding: Mapped["Embedding"] = relationship(
         back_populates="chunk", cascade="all, delete-orphan", uselist=False
     )
+    search_terms: Mapped[list["ReviewChunkTerm"]] = relationship(
+        back_populates="chunk", cascade="all, delete-orphan"
+    )
+
+
+class ReviewChunkTerm(Base):
+    __tablename__ = "review_chunk_terms"
+
+    chunk_id: Mapped[str] = mapped_column(
+        ForeignKey("review_chunks.id", ondelete="CASCADE"), primary_key=True, index=True
+    )
+    term: Mapped[str] = mapped_column(String(120), primary_key=True, index=True)
+    term_frequency: Mapped[int] = mapped_column(Integer)
+
+    chunk: Mapped[ReviewChunk] = relationship(back_populates="search_terms")
 
 
 class Embedding(Base):

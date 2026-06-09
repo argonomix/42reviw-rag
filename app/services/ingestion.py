@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 
-from app.db.models import Embedding, Review, ReviewChunk
+from app.db.models import Embedding, Review, ReviewChunk, ReviewChunkTerm
 from app.rag.embeddings import embedding_service
+from app.rag.keyword import term_frequencies
 from app.schemas import ReviewInput
 from app.services.chunking import chunk_review
 from app.services.normalization import load_records
@@ -9,6 +10,7 @@ from app.services.normalization import load_records
 
 def reset_data(db: Session) -> None:
     db.query(Embedding).delete()
+    db.query(ReviewChunkTerm).delete()
     db.query(ReviewChunk).delete()
     db.query(Review).delete()
     db.commit()
@@ -24,9 +26,22 @@ def ingest_reviews(db: Session, records: list[ReviewInput]) -> tuple[int, int]:
         review_count += 1
 
         for chunk_data in chunk_review(record):
-            chunk = ReviewChunk(review_id=review.id, **chunk_data)
+            frequencies = term_frequencies(chunk_data["chunk_text"])
+            chunk = ReviewChunk(
+                review_id=review.id,
+                search_token_count=sum(frequencies.values()),
+                **chunk_data,
+            )
             db.add(chunk)
             db.flush()
+            for term, frequency in frequencies.items():
+                db.add(
+                    ReviewChunkTerm(
+                        chunk_id=chunk.id,
+                        term=term,
+                        term_frequency=frequency,
+                    )
+                )
             vector = embedding_service.embed(chunk.chunk_text)
             db.add(
                 Embedding(

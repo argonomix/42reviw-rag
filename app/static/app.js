@@ -28,6 +28,7 @@ function renderChunks(items) {
         <span>score: ${item.score ?? "-"}</span>
         <span>passed: ${item.passed}</span>
         <span>sim: ${item.similarity}</span>
+        <span>source: ${item.retrieval_source ?? "-"}</span>
       </div>
       <p>${item.text}</p>
     `;

@@ -55,14 +55,28 @@ def ingest(request: IngestRequest, db: Session = Depends(get_db)) -> IngestRespo
 
 @router.post("/retrieve", response_model=RetrieveResponse)
 def retrieve(request: RetrieveRequest, db: Session = Depends(get_db)) -> RetrieveResponse:
-    chunks, latency_ms = retrieve_chunks(db, request.query, request.filters, request.top_k)
+    chunks, latency_ms = retrieve_chunks(
+        db,
+        request.query,
+        request.filters,
+        request.top_k,
+        request.retrieval_mode,
+        request.rerank,
+    )
     return RetrieveResponse(retrieved_chunks=chunks, latency_ms=latency_ms)
 
 
 @router.post("/query", response_model=QueryResponse)
 async def query(request: RetrieveRequest, db: Session = Depends(get_db)) -> QueryResponse:
     started = time.perf_counter()
-    chunks, _ = retrieve_chunks(db, request.query, request.filters, request.top_k)
+    chunks, _ = retrieve_chunks(
+        db,
+        request.query,
+        request.filters,
+        request.top_k,
+        request.retrieval_mode,
+        request.rerank,
+    )
     answer, confidence = await generate_answer(request.query, chunks)
     latency_ms = int((time.perf_counter() - started) * 1000)
     db.add(

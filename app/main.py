@@ -3,7 +3,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.api.routes import router
-from app.db.session import create_db_and_tables
+from app.db.session import run_schema_migrations
 
 
 app = FastAPI(title="ReviewRAG 42 Tokyo MVP", version="0.1.0")
@@ -13,7 +13,7 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 @app.on_event("startup")
 def on_startup() -> None:
-    create_db_and_tables()
+    run_schema_migrations()
 
 
 @app.get("/")

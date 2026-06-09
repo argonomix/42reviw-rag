@@ -42,6 +42,8 @@ class RetrieveRequest(BaseModel):
     query: str
     filters: QueryFilters = Field(default_factory=QueryFilters)
     top_k: int = Field(default=5, ge=1, le=20)
+    retrieval_mode: Literal["vector", "keyword", "hybrid"] | None = None
+    rerank: bool | None = None
 
     @field_validator("query")
     @classmethod
@@ -62,6 +64,10 @@ class RetrievedChunk(BaseModel):
     topic_label: str | None
     text: str
     similarity: float
+    vector_score: float | None = None
+    keyword_score: float | None = None
+    rerank_score: float | None = None
+    retrieval_source: str | None = None
 
 
 class RetrieveResponse(BaseModel):

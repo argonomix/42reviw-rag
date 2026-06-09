@@ -1,5 +1,8 @@
 from collections.abc import Generator
 
+from alembic import command
+from alembic.config import Config
+from sqlalchemy import inspect
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
@@ -27,3 +30,11 @@ def create_db_and_tables() -> None:
     from app.db import models  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
+
+
+def run_schema_migrations() -> None:
+    inspector = inspect(engine)
+    config = Config("alembic.ini")
+    if inspector.has_table("reviews") and not inspector.has_table("alembic_version"):
+        command.stamp(config, "0001_initial_schema")
+    command.upgrade(config, "head")

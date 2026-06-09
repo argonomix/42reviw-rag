@@ -8,6 +8,7 @@ Japanese-first RAG MVP for turning anonymized 42 Tokyo peer review feedback into
 - PostgreSQL + pgvector
 - Ollama local generation, default model `qwen2.5:7b-instruct`
 - Semantic embeddings with `sentence-transformers` and `intfloat/multilingual-e5-small`
+- Hybrid retrieval with BM25-style keyword search + vector search
 - Deterministic embedding fallback for local smoke tests
 
 ## Quick Start
@@ -32,8 +33,11 @@ curl http://localhost:8000/health
 curl -X POST http://localhost:8000/ingest -H 'Content-Type: application/json' -d '{"reset": true}'
 curl -X POST http://localhost:8000/query \
   -H 'Content-Type: application/json' \
-  -d '{"query":"minishellで落ちやすいポイントは？","filters":{"project_name":"minishell","campus":"42tokyo","language":"ja","passed":false},"top_k":8}'
+  -d '{"query":"minishellで落ちやすいポイントは？","filters":{"project_name":"minishell","campus":"42tokyo","language":"ja","passed":false},"top_k":8,"retrieval_mode":"hybrid"}'
 ```
+
+`retrieval_mode` is optional and supports `vector`, `keyword`, or `hybrid`; the default is `hybrid`.
+Set `"rerank": true` per request, or `RERANKER_ENABLED=true`, to rerank retrieved candidates with the configured cross-encoder model.
 
 ## Data Shape
 
@@ -66,5 +70,6 @@ pytest
 
 The default embedding backend is `sentence-transformers`, using `intfloat/multilingual-e5-small`.
 After changing embedding backends or models, re-ingest data with `{"reset": true}` or click `Seed ingest` so stored vectors match the active model.
+After applying retrieval schema migrations, re-ingest data the same way so stored keyword term frequencies are populated.
 
 Use `EMBEDDING_BACKEND=deterministic` only for lightweight local smoke tests that do not require semantic retrieval quality.

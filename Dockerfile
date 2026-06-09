@@ -6,11 +6,14 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 COPY pyproject.toml README.md ./
-COPY app ./app
-COPY data ./data
 
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir ".[ml]"
+
+COPY app ./app
+COPY data ./data
+COPY alembic.ini ./
+COPY migrations ./migrations
 
 EXPOSE 8000
 
