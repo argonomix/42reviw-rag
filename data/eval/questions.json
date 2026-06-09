@@ -1,0 +1,37 @@
+[
+  {
+    "query": "minishellで失敗しやすいポイントは？",
+    "filters": {"project_name": "minishell", "campus": "42tokyo", "language": "ja"},
+    "top_k": 5,
+    "expected_project": "minishell",
+    "expected_keywords": ["heredoc", "quote", "fd"]
+  },
+  {
+    "query": "pipexのfd closeで注意すべきことは？",
+    "filters": {"project_name": "pipex", "campus": "42tokyo", "language": "ja"},
+    "top_k": 5,
+    "expected_project": "pipex",
+    "expected_keywords": ["dup2", "fd", "valgrind"]
+  },
+  {
+    "query": "push_swap提出前に確認するテストは？",
+    "filters": {"project_name": "push_swap", "campus": "42tokyo", "language": "ja"},
+    "top_k": 5,
+    "expected_project": "push_swap",
+    "expected_keywords": ["重複", "空入力", "整数"]
+  },
+  {
+    "query": "libftでメモリリークしやすい関数は？",
+    "filters": {"project_name": "libft", "campus": "42tokyo", "language": "ja"},
+    "top_k": 5,
+    "expected_project": "libft",
+    "expected_keywords": ["ft_split", "free", "NULL"]
+  },
+  {
+    "query": "理解が深いレビュー評価にはどんな特徴がある？",
+    "filters": {"campus": "42tokyo", "language": "ja", "passed": true},
+    "top_k": 5,
+    "expected_project": "minishell",
+    "expected_keywords": ["説明", "テスト", "理解"]
+  }
+]

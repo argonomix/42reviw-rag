@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ReviewRAG 42 Tokyo</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="query-pane">
+        <div>
+          <p class="eyebrow">42 Tokyo Peer Review Intelligence</p>
+          <h1>レビュー知識検索</h1>
+        </div>
+        <form id="query-form">
+          <label>
+            質問
+            <textarea id="query" rows="4">minishellで落ちやすいポイントは？</textarea>
+          </label>
+          <div class="filters">
+            <label>
+              Project
+              <select id="project">
+                <option value="">すべて</option>
+                <option value="minishell">minishell</option>
+                <option value="pipex">pipex</option>
+                <option value="push_swap">push_swap</option>
+                <option value="libft">libft</option>
+              </select>
+            </label>
+            <label>
+              Result
+              <select id="passed">
+                <option value="">すべて</option>
+                <option value="false">Failed</option>
+                <option value="true">Passed</option>
+              </select>
+            </label>
+            <label>
+              Top K
+              <input id="top-k" type="number" min="1" max="20" value="8" />
+            </label>
+          </div>
+          <div class="actions">
+            <button type="button" id="ingest">Seed ingest</button>
+            <button type="submit">Query</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="result-pane">
+        <div class="answer">
+          <div class="answer-meta">
+            <span id="confidence">confidence: -</span>
+            <span id="latency">latency: -</span>
+          </div>
+          <pre id="answer">Seed ingest を実行してから質問してください。</pre>
+        </div>
+        <div>
+          <h2>Retrieved reviews</h2>
+          <div id="chunks" class="chunks"></div>
+        </div>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

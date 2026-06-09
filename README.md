@@ -1,0 +1,67 @@
+# ReviewRAG
+
+Japanese-first RAG MVP for turning anonymized 42 Tokyo peer review feedback into searchable engineering knowledge.
+
+## Stack
+
+- FastAPI backend
+- PostgreSQL + pgvector
+- Ollama local generation, default model `qwen2.5:7b-instruct`
+- Deterministic embedding fallback for local smoke tests
+- Optional `sentence-transformers` embedding backend with `intfloat/multilingual-e5-small`
+
+## Quick Start
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+Open `http://localhost:8000`, click `Seed ingest`, then ask a Japanese review question.
+
+For better generation quality, pull the Ollama model once:
+
+```bash
+docker compose exec ollama ollama pull qwen2.5:7b-instruct
+```
+
+## API
+
+```bash
+curl http://localhost:8000/health
+curl -X POST http://localhost:8000/ingest -H 'Content-Type: application/json' -d '{"reset": true}'
+curl -X POST http://localhost:8000/query \
+  -H 'Content-Type: application/json' \
+  -d '{"query":"minishellで落ちやすいポイントは？","filters":{"project_name":"minishell","campus":"42tokyo","language":"ja","passed":false},"top_k":8}'
+```
+
+## Data Shape
+
+The first ingestion target is JSON or JSONL exported from the 42 API and normalized into this canonical shape:
+
+```json
+{
+  "project_name": "minishell",
+  "campus": "42tokyo",
+  "language": "ja",
+  "reviewer_id_hash": "reviewer_001",
+  "reviewee_id_hash": "reviewee_001",
+  "score": 82,
+  "passed": true,
+  "created_at": "2026-06-09T00:00:00Z",
+  "raw_text": "パイプ処理は概ね正しいが、heredoc の Ctrl-C 挙動が bash と異なる。",
+  "source_type": "seed_json",
+  "source_payload": {}
+}
+```
+
+Unknown raw 42 API fields are preserved in `source_payload`.
+
+## Development
+
+```bash
+python -m pip install -e ".[dev]"
+pytest
+```
+
+Use `EMBEDDING_BACKEND=sentence-transformers` when you want semantic embeddings and have the model available locally or can download it.
