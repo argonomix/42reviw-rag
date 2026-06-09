@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class ReviewInput(BaseModel):
@@ -41,7 +41,15 @@ class QueryFilters(BaseModel):
 class RetrieveRequest(BaseModel):
     query: str
     filters: QueryFilters = Field(default_factory=QueryFilters)
-    top_k: int = Field(default=8, ge=1, le=20)
+    top_k: int = Field(default=5, ge=1, le=20)
+
+    @field_validator("query")
+    @classmethod
+    def query_must_not_be_blank(cls, value: str) -> str:
+        stripped = value.strip()
+        if not stripped:
+            raise ValueError("query must not be empty")
+        return stripped
 
 
 class RetrievedChunk(BaseModel):

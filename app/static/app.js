@@ -48,18 +48,36 @@ ingestButton.addEventListener("click", async () => {
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
+  const query = document.querySelector("#query").value.trim();
+  if (!query) {
+    answer.textContent = "質問を入力してください。";
+    confidence.textContent = "confidence: -";
+    latency.textContent = "latency: -";
+    chunks.innerHTML = "";
+    return;
+  }
   answer.textContent = "検索しています...";
   chunks.innerHTML = "";
   const response = await fetch("/query", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      query: document.querySelector("#query").value,
+      query,
       filters: filters(),
       top_k: Number(document.querySelector("#top-k").value),
     }),
   });
   const data = await response.json();
+  if (!response.ok) {
+    const detail = Array.isArray(data.detail)
+      ? data.detail.map((item) => item.msg).join("\n")
+      : data.detail || "検索リクエストに失敗しました。";
+    answer.textContent = detail;
+    confidence.textContent = "confidence: -";
+    latency.textContent = "latency: -";
+    renderChunks([]);
+    return;
+  }
   answer.textContent = data.answer || JSON.stringify(data, null, 2);
   confidence.textContent = `confidence: ${data.confidence ?? "-"}`;
   latency.textContent = `latency: ${data.latency_ms ?? "-"}ms`;

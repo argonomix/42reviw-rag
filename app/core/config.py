@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://reviewrag:reviewrag@localhost:5432/reviewrag"
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "qwen2.5:7b-instruct"
-    embedding_backend: str = "deterministic"
+    embedding_backend: str = "sentence-transformers"
     embedding_model_name: str = "intfloat/multilingual-e5-small"
     embedding_dimension: int = 384
     seed_data_path: str = "data/seed/reviews.json"

@@ -7,8 +7,8 @@ Japanese-first RAG MVP for turning anonymized 42 Tokyo peer review feedback into
 - FastAPI backend
 - PostgreSQL + pgvector
 - Ollama local generation, default model `qwen2.5:7b-instruct`
+- Semantic embeddings with `sentence-transformers` and `intfloat/multilingual-e5-small`
 - Deterministic embedding fallback for local smoke tests
-- Optional `sentence-transformers` embedding backend with `intfloat/multilingual-e5-small`
 
 ## Quick Start
 
@@ -64,4 +64,7 @@ python -m pip install -e ".[dev]"
 pytest
 ```
 
-Use `EMBEDDING_BACKEND=sentence-transformers` when you want semantic embeddings and have the model available locally or can download it.
+The default embedding backend is `sentence-transformers`, using `intfloat/multilingual-e5-small`.
+After changing embedding backends or models, re-ingest data with `{"reset": true}` or click `Seed ingest` so stored vectors match the active model.
+
+Use `EMBEDDING_BACKEND=deterministic` only for lightweight local smoke tests that do not require semantic retrieval quality.
