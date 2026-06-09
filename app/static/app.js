@@ -29,9 +29,10 @@ function renderChunks(items) {
       item.topic_label || "general",
       `score: ${item.score ?? "-"}`,
       `passed: ${item.passed}`,
-      `sim: ${item.similarity}`,
+      `match: ${item.similarity}`,
+      item.rank_score == null ? null : `rank: ${item.rank_score}`,
       `source: ${item.retrieval_source ?? "-"}`,
-    ]) {
+    ].filter((value) => value !== null)) {
       const span = document.createElement("span");
       span.textContent = value;
       meta.appendChild(span);

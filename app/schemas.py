@@ -65,6 +65,7 @@ class RetrievedChunk(BaseModel):
     topic_label: str | None
     text: str
     similarity: float
+    rank_score: float | None = None
     vector_score: float | None = None
     keyword_score: float | None = None
     rerank_score: float | None = None

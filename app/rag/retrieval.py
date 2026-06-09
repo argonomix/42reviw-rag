@@ -255,12 +255,23 @@ def _to_retrieved_chunk(candidate: RetrievalCandidate) -> RetrievedChunk:
         passed=candidate.review.passed,
         topic_label=candidate.chunk.topic_label,
         text=candidate.chunk.chunk_text,
-        similarity=round(candidate.final_score, 4),
+        similarity=_rounded(_match_quality_score(candidate)) or 0.0,
+        rank_score=_rounded(candidate.final_score),
         vector_score=_rounded(candidate.vector_score),
         keyword_score=_rounded(candidate.keyword_score),
         rerank_score=_rounded(candidate.rerank_score),
         retrieval_source=candidate.retrieval_source,
     )
+
+
+def _match_quality_score(candidate: RetrievalCandidate) -> float:
+    if candidate.rerank_score is not None:
+        return candidate.final_score
+    if candidate.vector_score is not None:
+        return candidate.vector_score
+    if candidate.keyword_score is not None:
+        return candidate.final_score
+    return candidate.final_score
 
 
 def _rounded(value: float | None) -> float | None:
