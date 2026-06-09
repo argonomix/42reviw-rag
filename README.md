@@ -56,6 +56,10 @@ the GPU Compose override:
 make run-gpu
 ```
 
+The browser UI always includes an Ollama inference toggle. Turn it off for
+retrieval-only searches; this skips generation even when the GPU Compose override
+is running.
+
 For the development workflow with both the Hugging Face cache and Ollama GPU access:
 
 ```bash
@@ -76,10 +80,17 @@ curl -X POST http://localhost:8000/ingest -H 'Content-Type: application/json' -d
 curl -X POST http://localhost:8000/query \
   -H 'Content-Type: application/json' \
   -d '{"query":"minishellで落ちやすいポイントは？","filters":{"project_name":"minishell","campus":"42tokyo","language":"ja","passed":false},"top_k":8,"retrieval_mode":"hybrid"}'
+curl -N -X POST http://localhost:8000/query/stream \
+  -H 'Content-Type: application/json' \
+  -d '{"query":"minishellで落ちやすいポイントは？","top_k":8,"generate_answer":false}'
 ```
 
 `retrieval_mode` is optional and supports `vector`, `keyword`, or `hybrid`; the default is `hybrid`.
 Set `"rerank": true` per request, or `RERANKER_ENABLED=true`, to rerank retrieved candidates with the configured cross-encoder model.
+`POST /query/stream` returns newline-delimited JSON events. It emits a
+`retrieval` event as soon as search finishes, then emits an `answer` event after
+Ollama generation when `"generate_answer": true`. Set `"generate_answer": false`
+for retrieval-only responses.
 
 ## Data Shape
 

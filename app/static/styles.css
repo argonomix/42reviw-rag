@@ -83,6 +83,16 @@ textarea {
   resize: vertical;
 }
 
+.toggle {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle input {
+  width: auto;
+}
+
 .filters {
   display: grid;
   grid-template-columns: 1fr 1fr 88px;

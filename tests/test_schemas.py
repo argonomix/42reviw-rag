@@ -20,10 +20,17 @@ def test_retrieve_request_keeps_new_retrieval_options_optional() -> None:
 
     assert request.retrieval_mode is None
     assert request.rerank is None
+    assert request.generate_answer is True
 
 
 def test_retrieve_request_accepts_hybrid_options() -> None:
-    request = RetrieveRequest(query="pipe leak", retrieval_mode="hybrid", rerank=True)
+    request = RetrieveRequest(
+        query="pipe leak",
+        retrieval_mode="hybrid",
+        rerank=True,
+        generate_answer=False,
+    )
 
     assert request.retrieval_mode == "hybrid"
     assert request.rerank is True
+    assert request.generate_answer is False
