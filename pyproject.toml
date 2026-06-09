@@ -3,7 +3,11 @@ name = "reviewrag"
 version = "0.1.0"
 description = "Japanese-first 42 Tokyo peer review RAG MVP"
 readme = "README.md"
+license = { file = "LICENSE" }
 requires-python = ">=3.11"
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+]
 dependencies = [
   "alembic>=1.13.0",
   "fastapi>=0.111.0",

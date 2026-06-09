@@ -188,3 +188,11 @@ dependencies without `sentence-transformers` and sets
 `EMBEDDING_BACKEND=deterministic` plus `RETRIEVAL_DEFAULT_MODE=keyword`.
 Do not use lightweight mode for semantic retrieval quality, and do not point
 stored semantic vectors at a deterministic query embedding backend.
+
+## License
+
+ReviewRAG is licensed under the MIT License. See [LICENSE](LICENSE).
+
+Third-party dependencies, tools, and models used with this project, including
+Ollama, `sentence-transformers`, and embedding/generation models, are licensed
+separately by their respective authors.
