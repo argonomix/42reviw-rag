@@ -2,6 +2,14 @@
 
 Japanese-first RAG MVP for turning anonymized 42 Tokyo peer review feedback into searchable engineering knowledge.
 
+## Demo
+
+![ReviewRAG browser UI showing a Japanese query, generated answer, confidence, latency, and retrieved review evidence.](docs/assets/demo.png)
+
+The demo UI lets users ask Japanese review questions, apply project/result filters,
+toggle Ollama generation, and inspect the retrieved review snippets that ground
+the answer.
+
 ## Stack
 
 - FastAPI backend
@@ -10,6 +18,43 @@ Japanese-first RAG MVP for turning anonymized 42 Tokyo peer review feedback into
 - Semantic embeddings with `sentence-transformers` and `intfloat/multilingual-e5-small`
 - Hybrid retrieval with BM25-style keyword search + vector search
 - Deterministic embedding backend for local smoke tests
+
+## Architecture
+
+ReviewRAG is a local-first RAG pipeline that turns anonymized 42 Tokyo peer
+review comments into searchable engineering knowledge. The system is organized
+around five layers: ingestion, indexing, retrieval, generation, and API/UI.
+
+```text
+reviews.json
+  -> normalization
+  -> chunking
+  -> keyword term extraction
+  -> embedding generation
+  -> PostgreSQL + pgvector
+  -> vector / keyword / hybrid retrieval
+  -> optional reranking
+  -> Ollama answer generation
+  -> FastAPI response / browser UI
+```
+
+The ingestion layer loads JSON or JSONL review records, normalizes metadata,
+chunks review text, extracts keyword-search terms, generates embeddings, and
+stores the result in PostgreSQL. The database keeps both structured review
+metadata and vector embeddings, so retrieval can combine semantic similarity
+with filters such as project, campus, language, topic, and pass/fail result.
+
+The retrieval layer supports `vector`, `keyword`, and `hybrid` modes. Hybrid
+retrieval combines vector similarity with BM25-style keyword search using
+reciprocal rank fusion, with optional reranking for higher-quality ordering.
+The generation layer sends retrieved evidence to Ollama and asks a local LLM to
+produce a grounded Japanese answer. If generation is unavailable, the app falls
+back to an evidence-based retrieval summary.
+
+FastAPI exposes the pipeline through health, ingestion, retrieval, query,
+streaming query, evaluation, and metrics endpoints. The browser UI provides a
+small query widget with filters, retrieved review snippets, confidence, latency,
+and an inference toggle for retrieval-only searches.
 
 ## Quick Start
 
